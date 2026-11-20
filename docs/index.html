@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RL Token 复现：宇树 R1-7a 与 Cobot Magic 插充电头</title>
+<meta name="description" content="在松灵 Cobot Magic 真机数据和宇树 R1-7a 双臂仿真上复现 RL token（RLT）的阶段性记录：模块实现、表征诊断、仿真示教、三个 VLA 基线训练与训练提速。">
+<style>
+:root{
+  --bg:#f6f4ef; --card:#ffffff; --ink:#1c1d21; --muted:#5d6068; --line:#e2ded4; --accent:#b4531a; --accent-soft:#f6e6da;
+  --ok:#1f7a4d; --ok-bg:#e2f3ea; --wip:#8a5a00; --wip-bg:#fbeecb; --todo:#5d6068; --todo-bg:#ebe9e3; --code:#f1eee7;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#15161a; --card:#1e2026; --ink:#ecebe6; --muted:#a3a5ad; --line:#30333b; --accent:#f0a36c; --accent-soft:#3a2a1f;
+    --ok:#7fd3a6; --ok-bg:#1d3529; --wip:#f1c96b; --wip-bg:#3a3018; --todo:#a3a5ad; --todo-bg:#2a2c33; --code:#272a31; }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+header.hero{padding:64px 0 36px;border-bottom:1px solid var(--line)}
+.kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.2;margin:.35em 0 .4em;letter-spacing:-.01em}
+.lede{font-size:18px;color:var(--muted);max-width:780px;margin:0}
+.hero-meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;font-size:14px}
+.btn{display:inline-block;padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+nav.toc{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.toc .wrap{display:flex;gap:18px;overflow-x:auto;padding-top:10px;padding-bottom:10px;font-size:14px;white-space:nowrap}
+nav.toc a{color:var(--muted)} nav.toc a:hover{color:var(--accent);text-decoration:none}
+section{padding:44px 0;border-bottom:1px solid var(--line)}
+h2{font-size:26px;margin:0 0 6px;letter-spacing:-.005em}
+h3{font-size:18px;margin:28px 0 8px}
+.sub{color:var(--muted);margin:0 0 18px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.card h3{margin-top:0}
+.card p{margin:.4em 0}
+.chip{display:inline-block;font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;vertical-align:middle;margin-left:6px}
+.done{color:var(--ok);background:var(--ok-bg)} .wip{color:var(--wip);background:var(--wip-bg)} .todo{color:var(--todo);background:var(--todo-bg)}
+ul{padding-left:1.25em;margin:.4em 0} li{margin:.25em 0}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:520px}
+th,td{padding:9px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600;background:color-mix(in srgb,var(--card) 70%,var(--bg))}
+tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.hl td{background:var(--accent-soft);font-weight:600}
+video,img.shot{width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--line);background:#000}
+figure{margin:0} figcaption{font-size:13.5px;color:var(--muted);margin-top:8px}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 10px 10px 0;margin:18px 0;font-size:15px}
+code{font:13.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--code);padding:1px 6px;border-radius:5px}
+ol.flow{counter-reset:s;list-style:none;padding:0;margin:10px 0;display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+ol.flow li{counter-increment:s;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px 10px 44px;position:relative;font-size:14.5px;margin:0}
+ol.flow li::before{content:counter(s);position:absolute;left:12px;top:10px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center}
+footer{padding:28px 0 60px;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">阶段性记录 · 2026 年 11 月</div>
+    <h1>RL Token 复现：宇树 R1-7a 与 Cobot Magic 插充电头</h1>
+    <p class="lede">我们想在"把充电头插进排插"这个毫米级任务上复现 RL token（RLT）：先让 VLA 学会整套动作，再用一个很小的强化学习模块把最后几厘米做准。这个页面记录目前做到了哪一步、测到了什么、还差什么。</p>
+    <div class="hero-meta">
+      <a class="btn primary" href="https://github.com/wangtonghui-fdu/RLT-Unitree-Cobot">代码仓库</a>
+      <a class="btn" href="#status">进展总览</a>
+      <a class="btn" href="#sim">看仿真示教</a>
+    </div>
+  </div>
+</header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#what">项目目标</a><a href="#status">进展总览</a><a href="#rlt">RL token 模块</a><a href="#probe">表征诊断</a><a href="#sim">R1-7a 仿真示教</a><a href="#train">三个基线训练</a><a href="#speed">训练提速</a><a href="#next">还没做的</a><a href="#repo">仓库与复现</a>
+</div></nav>
+
+<main class="wrap">
+
+<section id="what">
+  <h2>项目目标</h2>
+  <p class="sub">RL token 分两个阶段，我们在两台机器人上各做一部分。</p>
+  <div class="grid g2">
+    <div class="card">
+      <h3>RL token 是什么</h3>
+      <p>RL token（RLT，Xu et al. 2026，Physical Intelligence）的思路是：不直接对几十亿参数的 VLA 做强化学习，而是加一个小编码器，把 VLA 内部的表征压成一个向量，再在这个向量上训练一个很小的演员-评论家网络。</p>
+      <ul>
+        <li><b>阶段一</b>：VLA 照常做模仿学习微调，同时训练 RL token 的编码器和解码器。</li>
+        <li><b>阶段二</b>：冻结 VLA，在 RL token 上做在线强化学习，修正最后一段精细动作。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>两台机器人</h3>
+      <ul>
+        <li><b>松灵 Cobot Magic（真机）</b>：双臂、头部加双腕三路相机。自采 100 条"双手交接、插排插充电头"示教，用来训练 VLA 和 RL token 阶段一。</li>
+        <li><b>宇树 R1-7a（仿真）</b>：两条 7 自由度臂装在立柱上，配 Dex1-1 夹爪。真机数据分辨不了毫米级误差，所以搭了带真值的仿真，先在里面生成示教、训练基线。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="status">
+  <h2>进展总览</h2>
+  <p class="sub">截至 2026-11-20。阶段二（在线强化学习）还没有开始，目前不能说"复现完成"。</p>
+  <div class="tablewrap"><table>
+    <tr><th>内容</th><th>机器人</th><th>状态</th><th>结果</th></tr>
+    <tr><td>RL token 阶段一模块</td><td>Cobot Magic 真机数据</td><td><span class="chip done">已完成</span></td><td>与 VLA 微调并行训练，开关模块前 10 步主线损失逐位相同</td></tr>
+    <tr><td>VLA 全量微调（LingBot-VLA v2）</td><td>Cobot Magic 真机数据</td><td><span class="chip done">已完成</span></td><td>4000 步开环手臂误差 0.83°；真机能夹起插头，交接时双臂相撞</td></tr>
+    <tr><td>"RL token 里有没有毫米级几何"诊断</td><td>Cobot Magic 真机数据</td><td><span class="chip done">已完成</span></td><td>RL token 不比它的输入差；真机数据分辨不了毫米级</td></tr>
+    <tr><td>立柱双臂模型与规范动作示教</td><td>宇树 R1-7a 仿真</td><td><span class="chip done">已完成</span></td><td>128 条、5.4 万帧，每条约 14 秒，位置和朝向大范围随机</td></tr>
+    <tr><td>三个 VLA 基线训练</td><td>宇树 R1-7a 仿真</td><td><span class="chip wip">进行中</span></td><td>SmolVLA、π0.5、LingBot-VLA 同一份数据，尚无闭环评测</td></tr>
+    <tr><td>训练提速</td><td>—</td><td><span class="chip wip">进行中</span></td><td>LingBot-VLA 每步 8.2 → 6.2 秒；另外两个模型没有找到不改配方的办法</td></tr>
+    <tr><td>RL token 阶段二（在线强化学习）</td><td>两者</td><td><span class="chip todo">未开始</span></td><td>—</td></tr>
+    <tr><td>宇树 R1-7a 真机</td><td>宇树 R1-7a</td><td><span class="chip todo">未开始</span></td><td>—</td></tr>
+  </table></div>
+</section>
+
+<section id="rlt">
+  <h2>RL token 阶段一模块</h2>
+  <p class="sub">在 Cobot Magic 的 100 条真机示教上，和 LingBot-VLA v2（约 64 亿参数）的全量微调一起训练。</p>
+  <div class="grid g2">
+    <div class="card">
+      <h3>结构</h3>
+      <ul>
+        <li>输入是 VLA 最后一层的前缀隐状态：三路图像、语言和对齐查询 token。这些在部署推理时同样会算出来。</li>
+        <li>2 层编码器加一个查询 token，读出 2048 维的 RL token。</li>
+        <li>2 层因果解码器只靠 RL token 重建整段前缀；解码器的上下文有 90% 被遮掉，逼它真的用 RL token。</li>
+        <li>约 2.9 亿参数，独立的 AdamW（学习率 1e-4）和梯度裁剪。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>不干扰主线训练</h3>
+      <ul>
+        <li>输入先截断梯度，RL token 的损失不会回传到 VLA。</li>
+        <li>模块里所有随机数都用独立的随机数流。原因是注意力内核即使不开 dropout 也会推进全局随机状态，会改变 VLA 的噪声采样。</li>
+        <li>验证：开和关 RL token 各跑一遍，前 10 步的总损失、动作损失、辅助损失和梯度范数逐位相同。</li>
+        <li>每个 VLA 存档旁边都存一份配套的 RL token 权重。</li>
+      </ul>
+    </div>
+  </div>
+  <h3>VLA 本身训得怎么样</h3>
+  <div class="tablewrap"><table>
+    <tr><th>项目</th><th>结果</th></tr>
+    <tr><td>数据</td><td>100 条真机示教，约 10 万帧，30 帧/秒，三路相机</td></tr>
+    <tr><td>开环评测（训练集，4000 步）</td><td>手臂关节平均误差 0.83°，92.9% 的动作块在容差内</td></tr>
+    <tr><td>真机试跑（4000 步权重）</td><td>能夹起插头；交接时双臂相撞，任务失败</td></tr>
+  </table></div>
+  <div class="note">真机上卡在交接而不是插入，所以 RL token 阶段二还没有在真机上启动。开环误差很小只说明训练集拟合得好，不代表真机能成。</div>
+</section>
+
+<section id="probe">
+  <h2>表征诊断：RL token 里有没有毫米级几何</h2>
+  <p class="sub">插入需要毫米级的相对位置。我们用线性探针和小网络，从各种表征里读"插头离插孔还差多少"，看谁读得准。</p>
+  <div class="tablewrap"><table>
+    <tr><th>用来预测的输入</th><th class="num">中位误差（毫米）</th></tr>
+    <tr class="hl"><td>RL token</td><td class="num">8.2</td></tr>
+    <tr><td>右腕相机的 VLA token</td><td class="num">8.3</td></tr>
+    <tr><td>三路相机的 VLA token</td><td class="num">8.3</td></tr>
+    <tr><td>左腕相机的 VLA token</td><td class="num">约 10</td></tr>
+    <tr><td>只用关节角</td><td class="num">10.9</td></tr>
+    <tr><td>只知道"离插入还有几帧"</td><td class="num">11.5</td></tr>
+    <tr><td>头部相机的 VLA token</td><td class="num">约 11.8</td></tr>
+    <tr><td>直接假设"已经到位"</td><td class="num">16.8</td></tr>
+  </table></div>
+  <figcaption>插入前最后 30 毫米内的 1840 帧，按示教分 5 折交叉验证。标签用正运动学事后推出，不需要人工标注。</figcaption>
+  <h3>得到的结论</h3>
+  <ul>
+    <li><b>RL token 没有丢几何信息。</b>它读出来的精度和它的输入（腕部相机 token）一样。</li>
+    <li><b>腕部相机比头部相机好</b> 1.5 到 3 毫米。</li>
+    <li><b>提高图像分辨率没有帮助。</b>同一个视觉编码器换成更高分辨率，误差不降。</li>
+    <li><b>真机数据分辨不了毫米级。</b>修正标签后，最好的表征在最后 5 毫米内仍有约 3 毫米误差；模型能判断偏差方向，但幅度只预测出三到七成。约 100 条示教加事后标签不够。</li>
+  </ul>
+  <div class="note">最后一条是转去做仿真的直接原因：表征之间的毫米级比较，需要大量带真值的数据。</div>
+</section>
+
+<section id="sim">
+  <h2>宇树 R1-7a 仿真示教</h2>
+  <p class="sub">两条 R1-7a 装在立柱上，肩部比桌面高 35 厘米。SAPIEN 光线追踪渲染，物理仿真 1200 Hz，插入是真实接触，不是贴上去的。</p>
+  <div class="grid g2">
+    <figure>
+      <video controls preload="metadata" poster="media/poster_nominal.jpg" src="media/r1_dual_nominal.mp4"></video>
+      <figcaption>标准摆位，14.6 秒。左：总览；右：头部、左腕、右腕三路相机，也就是模型看到的画面。</figcaption>
+    </figure>
+    <figure>
+      <video controls preload="metadata" poster="media/poster_random.jpg" src="media/r1_dual_random.mp4"></video>
+      <figcaption>随机摆位，14.7 秒。</figcaption>
+    </figure>
+  </div>
+  <h3>动作流程</h3>
+  <ol class="flow">
+    <li>左手竖直下降，夹起平放的充电头</li>
+    <li>左手把充电头送到桌面中间，右手同时到位</li>
+    <li>右手从尾部接过：上指伸进左手两指之间，下指托底</li>
+    <li>右手翻转充电头移到插孔上方，左手同时伸向排插</li>
+    <li>左手扶住排插，左腕相机正对插孔</li>
+    <li>右手竖直、缓慢插入</li>
+    <li>双手松开回位</li>
+  </ol>
+  <h3>随机化</h3>
+  <div class="grid g2">
+    <figure>
+      <img class="shot" src="media/r1_layouts_grid.jpg" alt="16 条示教的初始画面，充电头和排插的位置、朝向各不相同">
+      <figcaption>16 条示教的头部相机初始画面。采样范围：充电头 18 × 16 厘米、转 ±40°；排插 16 × 14 厘米、转 ±30°。远离机器人一侧的摆位多数做不成，被剔除。</figcaption>
+    </figure>
+    <div class="card">
+      <h3>怎么保证每条都能做成</h3>
+      <ul>
+        <li>先不渲染，只跑物理：在大范围里随机摆 359 个位置，169 个（47%）能按上面的规范动作做成。</li>
+        <li>只渲染做得成的摆位，做不成的直接剔除，不为了凑范围去歪着夹或斜着插。</li>
+        <li>每一帧检查两臂之间有没有碰撞，有接触的不要。</li>
+        <li>结果：128 条、54244 帧，全部插到底，每条 13.5 到 15.4 秒。</li>
+      </ul>
+      <p style="color:var(--muted);font-size:14px">代价是摆位分布不均匀：远离机器人的位置和排插朝一个方向转的样本偏少。</p>
+    </div>
+  </div>
+  <figure style="margin-top:16px">
+    <img class="shot" src="media/r1_episode_sheet.jpg" alt="8 条示教的初始、交接、插入三个时刻">
+    <figcaption>每行一条示教：初始画面，交接时刻的三路相机，插入时刻的三路相机。排插斜放时左手扶的位置会跟着换，插孔始终在左腕相机画面内。</figcaption>
+  </figure>
+</section>
+
+<section id="train">
+  <h2>三个基线训练</h2>
+  <p class="sub">同一份仿真数据（128 条、三路相机、16 维状态和动作）上训练三个 VLA，作为 RL token 的起点。都在进行中，还没有闭环评测。</p>
+  <div class="tablewrap"><table>
+    <tr><th></th><th>SmolVLA</th><th>π0.5</th><th>LingBot-VLA v2</th></tr>
+    <tr><td>算力</td><td>2 × A40</td><td>8 × RTX 4090</td><td>4 × 96 GB 加速卡</td></tr>
+    <tr><td>全局批量</td><td>40</td><td>96</td><td>256（16 × 4 卡 × 累积 4 次）</td></tr>
+    <tr><td>学习率</td><td>1e-4，余弦</td><td>2.5e-5，余弦</td><td>5e-5，恒定</td></tr>
+    <tr><td>优化器</td><td>AdamW</td><td>AdamW</td><td>Muon</td></tr>
+    <tr><td>关节动作</td><td>绝对角度</td><td>相对当前状态的增量</td><td>相对当前状态的增量</td></tr>
+    <tr><td>图像增广</td><td>无</td><td>有</td><td>无</td></tr>
+    <tr><td>计划步数</td><td class="num">40000</td><td class="num">20000</td><td>不设上限</td></tr>
+    <tr><td>当前步数（11-20 晚）</td><td class="num">约 15000</td><td class="num">约 1500</td><td class="num">约 2100</td></tr>
+    <tr><td>当前训练损失</td><td class="num">约 0.010</td><td class="num">约 0.003</td><td class="num">约 0.008</td></tr>
+  </table></div>
+  <figcaption>三个模型的损失定义不同，不能横向比较。全局批量不统一是因为各自显存放得下的批量不同。</figcaption>
+</section>
+
+<section id="speed">
+  <h2>训练提速</h2>
+  <p class="sub">LingBot-VLA 每步要 8 秒，我们测了一步的时间花在哪，再逐项改。</p>
+  <h3>LingBot-VLA v2，4 卡，全局批量 256</h3>
+  <div class="tablewrap"><table>
+    <tr><th>配置</th><th class="num">秒/步</th><th>训练损失</th></tr>
+    <tr><td>基线（微批 16，累积 4 次）</td><td class="num">8.22</td><td>—</td></tr>
+    <tr><td>微批之间不重新切分参数</td><td class="num">7.94</td><td>24 步与基线逐位相同</td></tr>
+    <tr class="hl"><td>再加：Muon 每个矩阵只在一张卡上做正交化</td><td class="num">6.22</td><td>与基线差在第 4 位小数</td></tr>
+    <tr><td>再加：梯度检查点，微批 32 × 累积 2</td><td class="num">6.94</td><td>—</td></tr>
+    <tr><td>再加：梯度检查点，微批 64 × 累积 1</td><td class="num">7.33</td><td>—</td></tr>
+  </table></div>
+  <ul>
+    <li>基线一步 8.2 秒里：反向 3.3 秒，前向 2.5 秒，优化器 1.3 秒，两个蒸馏老师 1.1 秒，等数据 0 秒。</li>
+    <li>前两项已经用在正式训练里。梯度检查点在这套硬件上是负收益。</li>
+    <li>把老师的输出提前算好缓存下来还在做：深度老师的缓存和在线计算逐位一致，视频老师的还在核对。</li>
+  </ul>
+  <h3>另外两个模型</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h3>π0.5，8 × RTX 4090</h3>
+      <p>一步 5.8 秒里约 3.4 秒和批量大小无关，是卡间通信：这批卡不支持直连，参数分片每步都要经主机内存中转。调通信参数没有用，有的反而更慢。</p>
+    </div>
+    <div class="card">
+      <h3>SmolVLA，2 × A40</h3>
+      <p>显卡已经算满：反向占 62%，前向占 31%，数据加载占 0。不改训练配方的开关加起来只快 3%。</p>
+    </div>
+  </div>
+</section>
+
+<section id="next">
+  <h2>还没做的</h2>
+  <div class="grid g3">
+    <div class="card"><h3>阶段二在线强化学习</h3><p>在 RL token 上训练演员-评论家，这是 RL token 真正起作用的部分，目前没有开始。</p></div>
+    <div class="card"><h3>仿真闭环评测</h3><p>三个基线训完后，要在仿真里实际跑成功率，现在只有训练损失。</p></div>
+    <div class="card"><h3>仿真里的表征比较</h3><p>用仿真的真值重做"毫米级几何"诊断，这是真机数据做不了的。</p></div>
+    <div class="card"><h3>宇树 R1-7a 真机</h3><p>仿真里的相机内参和安装位姿按真机标定，但真机部署还没有开始。</p></div>
+    <div class="card"><h3>Cobot Magic 交接失败</h3><p>真机在交接时双臂相撞，需要补交接段的数据或加防撞。</p></div>
+  </div>
+</section>
+
+<section id="repo">
+  <h2>仓库与复现</h2>
+  <div class="tablewrap"><table>
+    <tr><th>目录</th><th>内容</th></tr>
+    <tr><td><code>rl_token/</code></td><td>RL token 阶段一模块、接入 LingBot-VLA 训练循环的补丁、随机数隔离的单元测试</td></tr>
+    <tr><td><code>representation_probe/</code></td><td>特征提取和探针脚本（表征诊断）</td></tr>
+    <tr><td><code>sim_r1/</code></td><td>立柱双臂 URDF 生成、逆运动学、两臂碰撞检查、示教生成、布局搜索、转 LeRobot 格式</td></tr>
+    <tr><td><code>training/</code></td><td>三个模型的训练配置和数据接入代码</td></tr>
+    <tr><td><code>speedups/</code></td><td>LingBot-VLA 的计时、两项提速补丁、老师输出缓存</td></tr>
+  </table></div>
+  <h3>仓库里没有的东西</h3>
+  <ul>
+    <li><b>第三方模型文件</b>：宇树 R1-7a 和 Dex1-1 的网格与 URDF 请从宇树官方获取；排插和充电头模型来自 RoboDojo 基准的 plug_in_charger 任务素材。</li>
+    <li><b>模型代码和权重</b>：LingBot-VLA v2、openpi（π0.5）、LeRobot（SmolVLA）请用各自的官方仓库；这里只有针对它们的补丁和配置。</li>
+    <li><b>真机数据和训练出的权重</b>。</li>
+  </ul>
+</section>
+
+</main>
+
+<footer><div class="wrap">最后更新：2026-11-20 · <a href="https://github.com/wangtonghui-fdu/RLT-Unitree-Cobot">github.com/wangtonghui-fdu/RLT-Unitree-Cobot</a></div></footer>
+</body>
+</html>

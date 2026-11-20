@@ -1,0 +1,24 @@
+# Unitree R1-7a column dual-arm robot + Dex1-1 grippers, sim handover + plug task (11-20, gen_dual_v6f.py (fast demos, ~14 s) -> to_lerobot_dual.py, LeRobot v3.0).
+# Same keys as agilex_insert_charge.yaml: arm.position = 14 joints (left J1..J7, right J1..J7, rad), effector.position = 2 gripper
+# openings (0 closed..1 open).  action = commanded target of the next frame; arm action relative to the arm state, grippers absolute.
+states:
+  - observation.state.arm.position:
+      origin_keys: observation.state.arm.position
+  - observation.state.effector.position:
+      origin_keys: observation.state.effector.position
+
+actions:
+  - action.arm.position:
+      origin_keys: action.arm.position
+      subtract_state: true
+      relative_type: joint
+  - action.effector.position:
+      origin_keys: action.effector.position
+      subtract_state: false
+
+images:
+  - observation.images.camera_top
+  - observation.images.camera_wrist_left
+  - observation.images.camera_wrist_right
+
+norm_stats: /path/to/storage/lingbot-cobot-ppu/cfg/norm_stats/r1_dual_v6f.json

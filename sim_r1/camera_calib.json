@@ -1,0 +1,505 @@
+{
+ "date": "2026-11-03 15:36",
+ "run": "runs/calib/head_1103_153619",
+ "world": "the arm's base frame (+z up, table top z = -0.026)",
+ "head": {
+  "K": [
+   [
+    610.212,
+    0.0,
+    332.722
+   ],
+   [
+    0.0,
+    610.212,
+    243.955
+   ],
+   [
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "dist": [
+   0.0988,
+   -0.28003,
+   0.00037,
+   0.00547,
+   0.0
+  ],
+  "T_world_cam": [
+   [
+    -0.99985,
+    -0.01693,
+    0.00222,
+    0.2084
+   ],
+   [
+    -0.01693,
+    0.96605,
+    -0.2578,
+    0.02609
+   ],
+   [
+    0.00222,
+    -0.2578,
+    -0.9662,
+    0.82839
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "size": [
+   640,
+   480
+  ],
+  "quality": {
+   "board": {
+    "corners": 24,
+    "rms_px": 0.82,
+    "max_px": 2.55,
+    "f_this_view": 1072.0
+   },
+   "f_from_depth_height": 609.8
+  },
+  "intrinsics": {
+   "method": "f from the depth unit's height over the table (854.4 mm; tape measure 850 mm, 2026-11-03), the centre and k1 k2 p1 p2 from the hand-held frames refit at that f (they fit f 579..610 alike: rms 0.625..0.638)",
+   "run": "runs/calib/head_K_1102_232051, runs/calib/head_K_1103_114953",
+   "rms_px": 0.638,
+   "frames": 41,
+   "replaced": "f 578.787 (hand-held alone, 11:52: it set the lens 815 mm over the table)"
+  }
+ },
+ "depth": {
+  "K": [
+   [
+    570.3422,
+    0,
+    319.5
+   ],
+   [
+    0,
+    570.3422,
+    239.5
+   ],
+   [
+    0,
+    0,
+    1
+   ]
+  ],
+  "T_world_cam": [
+   [
+    -0.99791,
+    -0.01722,
+    0.06227,
+    0.16559
+   ],
+   [
+    -0.03294,
+    0.96478,
+    -0.26102,
+    -0.00661
+   ],
+   [
+    -0.05556,
+    -0.26251,
+    -0.96333,
+    0.82837
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "size": [
+   640,
+   480
+  ],
+  "quality": {
+   "table_tilt_before_deg": 4.44,
+   "table_offset_before_mm": -6.1,
+   "table_spread_mm": 2.8,
+   "kept_rigid_to_head_from": "runs/calib/1030_205602"
+  },
+  "T_head_depth": [
+   [
+    0.99981,
+    0.01892,
+    0.00373,
+    -0.01325
+   ],
+   [
+    -0.01874,
+    0.99884,
+    -0.04447,
+    0.00514
+   ],
+   [
+    -0.00458,
+    0.04438,
+    0.99901,
+    0.01067
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "T_head_depth_from": "runs/calib/1030_205602"
+ },
+ "wrist": {
+  "K": [
+   [
+    588.231,
+    0.0,
+    311.886
+   ],
+   [
+    0.0,
+    588.197,
+    251.671
+   ],
+   [
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "dist": [
+   -0.35589,
+   0.10381,
+   -0.00202,
+   0.00035,
+   0.0
+  ],
+  "size": [
+   640,
+   480
+  ],
+  "T_tcp_cam": [
+   [
+    0.99806,
+    0.058,
+    -0.02242,
+    0.00308
+   ],
+   [
+    -0.02922,
+    0.11921,
+    -0.99244,
+    0.08634
+   ],
+   [
+    -0.05489,
+    0.99117,
+    0.12067,
+    -0.06379
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "T_tcp_cam_note": "the camera in the frame R1Kinematics.fk(joints) gives (the gripper centre, Link7's axes): T_world_cam = fk(q) @ T_tcp_cam",
+  "quality": {
+   "rms_px": 3.67,
+   "held_out_rms_px": 4.02,
+   "views": 29,
+   "left_out": [],
+   "run": "runs/calib/board_1104_111943",
+   "method": "camera_calib/wrist_reseat.py: X and f, the sheet, square and joints kept",
+   "moved_mm": 6.3,
+   "turned_deg": 11.39,
+   "f_before": 588.231,
+   "date": "2026-11-04 11:26"
+  },
+  "T_tcp_cam_before": [
+   [
+    0.99419,
+    -0.0167,
+    -0.10636,
+    0.00529
+   ],
+   [
+    -0.09756,
+    0.27812,
+    -0.95558,
+    0.0855
+   ],
+   [
+    0.04554,
+    0.9604,
+    0.27488,
+    -0.05792
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ]
+ },
+ "method": "ChArUco board taped on the table (camera_calib/board_*.py)",
+ "board": {
+  "T_world_board": [
+   [
+    -0.99992,
+    0.012669,
+    0.0,
+    0.081824
+   ],
+   [
+    0.012669,
+    0.99992,
+    0.0,
+    -0.460273
+   ],
+   [
+    0.0,
+    0.0,
+    -1.0,
+    -0.0259
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "square_m": 0.035617,
+  "squares": [
+   5,
+   7
+  ],
+  "dictionary": "DICT_4X4_50",
+  "marker_ratio": 0.7,
+  "centre": [
+   -0.0056,
+   -0.3345,
+   -0.0259
+  ],
+  "free_fit_tilt_deg": 1.65,
+  "free_fit_centre_height_mm": 1.9
+ },
+ "joints": {
+  "zero_offsets_fitted_deg_not_applied": {
+   "J2": 0.004,
+   "J3": -0.021,
+   "J4": -0.003,
+   "J5": -0.012,
+   "J6": -0.046
+  },
+  "rms_px_as_read": 2.07,
+  "joint_calib_note": "J2..J6 zeros set 2026-11-01 from runs/calib/board_1101_195755 (joint_calib.txt's comment line); checked 11-02"
+ },
+ "so101_wrist": {
+  "K": [
+   [
+    1510.853,
+    0.0,
+    616.599
+   ],
+   [
+    0.0,
+    1512.094,
+    421.271
+   ],
+   [
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "dist": [
+   0.0196,
+   0.2143,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "size": [
+   1280,
+   720
+  ],
+  "intrinsics": {
+   "run": "runs/calib/so101_K_1103_124650, runs/calib/so101_K_1103_121812",
+   "rms_px": 1.323,
+   "frames": 45,
+   "std_fx_fy_cx_cy": [
+    6.13,
+    5.75,
+    3.16,
+    3.68
+   ],
+   "f_from_hand_eye": "f 1386.7 (hand-held) -> 1510.9 by the hand-eye fit (so101_hand_1104_125740)"
+  },
+  "device": "/dev/v4l/by-id/usb-046d_C270_HD_WEBCAM_200901010001-video-index0",
+  "T_tcp_cam": [
+   [
+    0.00467,
+    0.99718,
+    -0.07489,
+    -0.00059
+   ],
+   [
+    -0.97711,
+    -0.01138,
+    -0.21241,
+    0.08312
+   ],
+   [
+    -0.21266,
+    0.07416,
+    0.97431,
+    -0.09219
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "T_tcp_cam_note": "the C270 in the SO-101's gripper_frame_link: T_world_cam = so101.T_world_base @ fk(scales * q + offsets) @ T_tcp_cam",
+  "hand_eye": {
+   "rms_px": 20.94,
+   "held_out_rms_px": 23.59,
+   "views": 44,
+   "run": "runs/calib/so101_hand_1104_125740",
+   "written_below_gate": [
+    "rms 20.9 > 3.0 px",
+    "\u7559\u51fa rms 23.6 > 5.0 px"
+   ],
+   "table_error_mm_held_out": {
+    "median_mm": 5.2,
+    "p90_mm": 20.2,
+    "max_mm": 70.5,
+    "A": {
+     "median_mm": 6.8,
+     "p90_mm": 32.0,
+     "max_mm": 70.5
+    },
+    "B": {
+     "median_mm": 3.6,
+     "p90_mm": 8.4,
+     "max_mm": 13.0
+    }
+   },
+   "run_b": "runs/calib/so101_hand_1104_140029",
+   "views_ab": [
+    24,
+    20
+   ]
+  }
+ },
+ "so101": {
+  "T_world_base": [
+   [
+    0.0002,
+    0.99882,
+    -0.04847,
+    0.43657
+   ],
+   [
+    -0.99991,
+    0.00086,
+    0.01349,
+    0.05011
+   ],
+   [
+    0.01352,
+    0.04846,
+    0.99873,
+    0.02139
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "joint_offsets_deg": {
+   "shoulder_pan": 0.0,
+   "shoulder_lift": -16.859,
+   "elbow_flex": 21.264,
+   "wrist_flex": -7.97,
+   "wrist_roll": 0.0
+  },
+  "joint_scales": {
+   "shoulder_pan": 1.0,
+   "shoulder_lift": 1.0913,
+   "elbow_flex": 0.9997,
+   "wrist_flex": 1.0,
+   "wrist_roll": 1.0
+  },
+  "servo_limits": {
+   "shoulder_pan": [
+    768,
+    3495
+   ],
+   "shoulder_lift": [
+    180,
+    2540
+   ],
+   "elbow_flex": [
+    1243,
+    3451
+   ],
+   "wrist_flex": [
+    728,
+    3127
+   ],
+   "wrist_roll": [
+    0,
+    4095
+   ]
+  },
+  "convention": "q = joint_scales * LeRobot degrees ((raw - (min + max) / 2) * 360 / 4095 from the servos' EEPROM limits) + joint_offsets_deg; fk: ../LeRobot/so101_kinematics.py (base_link -> gripper_frame_link)",
+  "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5AA9024278-if00",
+  "quality": {
+   "base_tilt_deg": 2.88,
+   "rms_px": 20.94,
+   "held_out_rms_px": 23.59,
+   "views": 44,
+   "run": "runs/calib/so101_hand_1104_125740",
+   "written_below_gate": [
+    "rms 20.9 > 3.0 px",
+    "\u7559\u51fa rms 23.6 > 5.0 px"
+   ],
+   "table_error_mm_held_out": {
+    "median_mm": 5.2,
+    "p90_mm": 20.2,
+    "max_mm": 70.5,
+    "A": {
+     "median_mm": 6.8,
+     "p90_mm": 32.0,
+     "max_mm": 70.5
+    },
+    "B": {
+     "median_mm": 3.6,
+     "p90_mm": 8.4,
+     "max_mm": 13.0
+    }
+   },
+   "run_b": "runs/calib/so101_hand_1104_140029",
+   "views_ab": [
+    24,
+    20
+   ]
+  }
+ }
+}

@@ -1,0 +1,25 @@
+# Insert-charge task (user data agilex-aloha-insert-charge-100demos-20261110, LeRobot v3.0). = official
+# configs/robot_configs/agilex_cobot_magic.yaml + relative_type: joint (be969b8 defaults to quaternion_local and asserts
+# end.position for subtract_state) + norm stats with the 3 state spikes repaired (data/insert_charge_v1/SPIKE_FIXES.json).
+# action.* = leader-arm target of the next control step (README); arm action relative to the arm state, gripper absolute (m).
+states:
+  - observation.state.arm.position:
+      origin_keys: observation.state.arm.position
+  - observation.state.effector.position:
+      origin_keys: observation.state.effector.position
+
+actions:
+  - action.arm.position:
+      origin_keys: action.arm.position
+      subtract_state: true
+      relative_type: joint
+  - action.effector.position:
+      origin_keys: action.effector.position
+      subtract_state: false
+
+images:
+  - observation.images.camera_top
+  - observation.images.camera_wrist_left
+  - observation.images.camera_wrist_right
+
+norm_stats: agilex_insert_charge_fix.json  # relative to this assets folder; use an absolute path when installing
